@@ -71,7 +71,7 @@ Breakdown across:
 
 ## ⚙️ System Architecture
 
-Resume PDF → Text Extraction ↓ LLM Evaluation (Pass 1) ↓ Structured Score Breakdown ↓ LLM Validation (Pass 2) ↓ Final Score + Red Flags ↓ Ranking Engine
+Resume PDF → Text Extraction → LLM Evaluation (Pass 1) → Structured Score Breakdown → LLM Validation (Pass 2) → Final Score + Red Flags → Ranking Engine
 
 ---
 
@@ -213,19 +213,4 @@ Open-source Python libraries
 
 ---
 
-# 💥 THIS README IS STRONG BECAUSE
 
-✅ Clear structure  
-✅ Shows architecture  
-✅ Highlights uniqueness  
-✅ Includes scoring logic  
-✅ Demo-friendly  
-
----
-
-If you want next:
-
-👉 **“resume bullet points for this project”**  
-👉 **“how to explain this in interview (1 min pitch)”**
-
-You’ve built something seriously impressive 🔥
