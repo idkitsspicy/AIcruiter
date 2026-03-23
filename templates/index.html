@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Evaluator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>AI Resume Evaluator 🚀</h1>
+
+    <!-- JD INPUT -->
+    <h3>Upload Job Description (PDF) OR Paste</h3>
+    <input type="file" id="jdFile">
+    <textarea id="jd" placeholder="Paste JD here (optional)"></textarea>
+
+    <!-- SINGLE RESUME -->
+    <h3>Single Resume Evaluation</h3>
+    <input type="file" id="resumeFile">
+    <button onclick="evaluateResume()">Evaluate</button>
+
+    <!-- MULTI RESUME -->
+    <h3>Candidate Ranking</h3>
+    <input type="file" id="resumeFiles" multiple>
+    <button onclick="rankCandidates()">Rank Candidates</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+async function evaluateResume() {
+    const file = document.getElementById("resumeFile").files[0];
+    const jdFile = document.getElementById("jdFile").files[0];
+    const jdText = document.getElementById("jd").value;
+
+    if (!file) {
+        alert("Upload a resume!");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("resume", file);
+
+    if (jdFile) {
+        formData.append("jd_file", jdFile);
+    } else {
+        formData.append("jd_text", jdText);
+    }
+
+    document.getElementById("result").innerHTML = "⏳ Evaluating...";
+
+    const res = await fetch("/upload-evaluate", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+    displayResult(data);
+}
+
+async function rankCandidates() {
+    const files = document.getElementById("resumeFiles").files;
+    const jdFile = document.getElementById("jdFile").files[0];
+    const jdText = document.getElementById("jd").value;
+
+    if (files.length < 2) {
+        alert("Upload at least 2 resumes!");
+        return;
+    }
+
+    let formData = new FormData();
+
+    for (let i = 0; i < files.length; i++) {
+        formData.append("resumes", files[i]);
+    }
+
+    if (jdFile) {
+        formData.append("jd_file", jdFile);
+    } else {
+        formData.append("jd_text", jdText);
+    }
+
+    document.getElementById("result").innerHTML = "⏳ Ranking candidates...";
+
+    const res = await fetch("/upload-rank", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+    displayRanking(data);
+}
+
+function displayResult(data) {
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.innerHTML = `
+    <h2>Score: ${data.final_score}</h2>
+    <h3>Verdict: ${data.verdict}</h3>
+
+    <h3>📊 Breakdown</h3>
+    <ul>
+        <li><b>Skill Match:</b> ${data.skill_match}</li>
+        <li><b>Depth of Experience:</b> ${data.depth_of_experience}</li>
+        <li><b>Role Alignment:</b> ${data.role_alignment}</li>
+        <li><b>Additional Strengths:</b> ${data.additional_strengths}</li>
+    </ul>
+
+    <h4>Strengths</h4>
+    <ul>${(data.strengths || []).map(s => `<li>${s}</li>`).join("")}</ul>
+
+    <h4>Gaps</h4>
+    <ul>${(data.gaps || []).map(g => `<li>${g}</li>`).join("")}</ul>
+
+    <h4>Red Flags</h4>
+    <ul>${(data.validation?.red_flags || []).map(f => `<li>${f}</li>`).join("")}</ul>
+
+    <p><b>Reason:</b> ${data.reason}</p>
+`;
+}
+
+function displayRanking(data) {
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.innerHTML = "<h2>🏆 Candidate Ranking</h2>";
+
+    data.forEach(c => {
+    let scoreClass = c.score > 70 ? "score-high" : 
+                     c.score > 40 ? "score-medium" : "score-low";
+
+    resultDiv.innerHTML += `
+        <div class="card">
+            <h3>Rank ${c.rank} - 
+                <span class="${scoreClass}">${c.score}</span>
+            </h3>
+
+            <p><b>Name:</b> ${c.name}</p>
+            <p><b>Verdict:</b> ${c.verdict}</p>
+            <p><b>Credibility:</b> ${c.credibility}</p>
+
+            <p><b>Red Flags:</b></p>
+            <ul>
+                ${(c.red_flags || []).map(f => `<li>${f}</li>`).join("")}
+            </ul>
+
+            <p><b>Reason:</b> ${c.reason}</p>
+        </div>
+    `;
+});
+}
+</script>
+
+</body>
+</html>
