@@ -1,12 +1,3 @@
-# AIcruiter
-Here’s a clean, professional README.md you can directly copy-paste 🔥
-(Perfect for GitHub + demo + interviews)
-
-
----
-
-📄 README.md
-
 # 🚀 AI-Powered Resume Evaluator & Candidate Ranking System
 
 An intelligent system that evaluates resumes against a Job Description (JD) using context-aware analysis, and ranks candidates based on skill alignment, experience depth, and credibility.
